@@ -1,9 +1,10 @@
 {{- if .Values.ingress.enabled -}}
 {{- $fullName := include "httpbin.fullname" . -}}
 {{- $svcPort := .Values.service.port -}}
-{{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
+{{- $kubeVersion := .Capabilities.KubeVersion.GitVersion -}}
+{{- if semverCompare ">=1.19-0" $kubeVersion -}}
 apiVersion: networking.k8s.io/v1
-{{- else if semverCompare ">=1.14-0" .Capabilities.KubeVersion.GitVersion -}}
+{{- else if semverCompare ">=1.14-0" $kubeVersion -}}
 apiVersion: networking.k8s.io/v1beta1
 {{- else -}}
 apiVersion: extensions/v1beta1
@@ -34,20 +35,19 @@ spec:
       http:
         paths:
         {{- range .paths }}
-        {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
-          - pathType: prefix
-            path: {{ . }}
+          - path: {{ . }}
+            {{ if semverCompare ">=1.19-0" $kubeVersion -}}
+            pathType: prefix
             backend:
-              service
+              service:
                 name: {{ $fullName }}
                 port:
                   number: {{ $svcPort }}
-        {{- else -}}
-          - path: {{ . }}
+            {{ else -}}
             backend:
               serviceName: {{ $fullName }}
               servicePort: {{ $svcPort }}
-        {{- end -}}
+            {{- end -}}
         {{- end -}}
   {{- end -}}
 {{- end -}}
