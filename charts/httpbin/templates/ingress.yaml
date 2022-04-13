@@ -37,7 +37,7 @@ spec:
         {{- range .paths }}
           - path: {{ . }}
             {{ if semverCompare ">=1.19-0" $kubeVersion -}}
-            pathType: prefix
+            pathType: Prefix
             backend:
               service:
                 name: {{ $fullName }}
