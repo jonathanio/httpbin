@@ -3,7 +3,7 @@ kind: Pod
 metadata:
   name: "{{ include "httpbin.fullname" . }}-test-connection"
   labels:
-{{ include "httpbin.labels" . | nindent 4 }}
+    {{- include "httpbin.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test-success
 spec:
